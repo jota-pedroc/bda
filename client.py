@@ -24,7 +24,7 @@ class Person:
 	
 	@staticmethod
 	def person_from_insert_stmnt(stmnt):
-		if not stmnt.strip() or 'GO' in stmnt:
+		if 'INSERT' not in stmnt:
 			return None
 		values = stmnt.find("VALUES")
 		first_arg = stmnt.find('(', values)
@@ -107,6 +107,7 @@ def main():
 	#--------------------------OUTPUT-------------------------------
 	# count = {}
 	sql_clients_file = open("clients.sql", "w")
+	sql_clients_file.write("USE [lolbibs]\nGO\n\n")
 	for person in persons:
 		#print person
 		#print person.insertStmnt()	

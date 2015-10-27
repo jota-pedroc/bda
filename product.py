@@ -17,7 +17,7 @@ class Product:
 
 	@staticmethod
 	def product_from_insert_stmnt(stmnt):
-		if not stmnt.strip() or 'GO' in stmnt:
+		if 'INSERT' not in stmnt:
 			return None
 		values = stmnt.find("VALUES")
 		first_arg = stmnt.find('(', values)

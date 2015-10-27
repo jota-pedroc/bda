@@ -23,7 +23,7 @@ class Employee:
 	
 	@staticmethod
 	def employee_from_insert_stmnt(stmnt):
-		if not stmnt.strip() or 'GO' in stmnt:
+		if 'INSERT' not in stmnt:
 			return None
 		values = stmnt.find("VALUES")
 		first_arg = stmnt.find('(', values)
@@ -117,6 +117,7 @@ def main():
 	#--------------------------OUTPUT-------------------------------
 	count = {}
 	sql_employees_file = open("employees.sql", "w")
+	sql_employees_file.write("USE [lolbibs]\nGO\n\n")
 	for employee in employees:
 		#print person
 		#print person.insertStmnt()	

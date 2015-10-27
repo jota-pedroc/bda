@@ -52,6 +52,7 @@ def generate_sales(n_sales, establishments, cities_to_clients, products, employe
 		# 5. pick a time
 		time = randint(1325469526, 1445867507) 
 		date = datetime.datetime.fromtimestamp(time)
+		date = date.replace(hour=0, minute=0, second=0)
 		time = str(date) + '.000'
 
 		# 6. pick an employee from that establishment
@@ -96,12 +97,14 @@ def main():
 
 	#--------------------OUTPUT--------------------------------
 	sql_orders_file = open("orders.sql", "w")
+	sql_orders_file.write("USE [lolbibs]\nGO\n\n")
 	for line in orders:
 		sql_orders_file.write(line + "\n")
 	sql_orders_file.write('GO\n\n')
 	sql_orders_file.close()
 
 	sql_sales_file = open("sales.sql", "w")
+	sql_sales_file.write("USE [lolbibs]\nGO\n\n")
 	for line in sales:
 		sql_sales_file.write(line + "\n")
 	sql_sales_file.write('GO\n\n')
