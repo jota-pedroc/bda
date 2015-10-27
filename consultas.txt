@@ -1,0 +1,57 @@
+1. Pegue as vendas de Recife, Jaboatão e Olinda.
+
+WITH SET [cidades] AS '{[dim pedido].[city].[recife], [dim pedido].[city].[jaboatao], [dim pedido].[city].[olinda]}'
+SELECT {[cidades]} ON COLUMNS, {[vendas].[valor]} ON ROWS
+FROM [cubo da gente]
+
+2. Pegue o total do valor das vendas de Recife, Jaboatão e Olinda.
+
+WITH SET [cidades] AS '{[dim pedido].[city].[recife], [dim pedido].[city].[jaboatao], [dim pedido].[city].[olinda]}'
+SELECT SUM({[cidades]}, [VENDA].[VALOR]) ON COLUMNS, {[vendas].valor} ON ROWS
+FROM [cubo da gente]
+
+3. Qual foi a quantidade vendida por todas as categorias de produto e todas as cidades? Ordene pela quantidade vendida.
+
+SELECT {[vendas] . [quantity] } on columns,
+ order([dim product].[category name].children, [vendas].[quantity], ASC) on rows
+ from [cubo da gente]
+
+4. Qual foi a quantidade média vendida de cada categoria de produto de janeiro a marco de 2015 em recife, separados por bairro?
+
+SELECT avg( {[time].[mes].[janeiro] : [time].[mes].[marco]} , [vendas].[quantity]) ON columns, CROSSJOIN({[dim pedido].[bairro].children},{[dim produto].[categoria_produto].children}) on rows WHERE [dim pedido].[cidade].[Recife]
+from [cubo da gente]
+
+5. Qual foi a maior quantidade  de vendas de cada categoria de produto de janeiro a marco de 2015 em recife, separados por bairro?
+
+SELECT max( {[time].[mes].[janeiro] : [time].[mes].[marco]} , [vendas].[quantity]) ON columns, CROSSJOIN({[dim pedido].[bairro].children},{[dim produto].[categoria_produto].children})  on rows WHERE [dim pedido].[cidade].[Recife]
+from [cubo da gente]
+
+6. Quantos pedidos o cliente fulano (com o cpf 0) já fez?
+
+SELECT {[dim cliente].[nome]} on columns,
+ where ([dim cliente].[cpf].[0], COUNT( {[dim pedido].[all].children}))
+from [cubo da gente]
+
+7. Qual foi a quantidade média vendida de cada categoria de produto de janeiro a marco de 2015 em recife, separados por bairro?
+
+SELECT avg( {[time].[mes].[janeiro] : [time].[mes].[marco]} , [vendas].[quantity]) ON columns, ([dim pedido].[bairro].children,[dim produto].[categoria_produto].children) on rows WHERE [dim pedido].[cidade].[Recife]
+from [cubo da gente]
+
+8. Mostre os dados referentes a 2014, 2015 e aos semestres de 2015.
+
+SELECT { Hierarquize (DrillDownMember ({[time].[ano].[2014] : [time].[ano].[2015]},{[time].[ano].[2015]}))} ON COLUMNS from [cubo da gente]
+
+9. Mostre os dados referentes a 2014, 2015 com mas detalhes. (use DrillDownLevel)
+
+SELECT { DrillDownLevel (DrillDownMember ({[time].[ano].[2014] : [time].[ano].[2015]},{[time].[ano].[2015]})} ON COLUMNS from [cubo da gente]
+
+10. Mostre os funcionarios de recife
+
+WITH MEMBER [Measures].[entregador] AS
+'funcionario.CurrentMember.Properties("CPF")'
+SELECT {[PEDIDO].[CIDADE].[RECIFE]} ON COLUMNS,
+{  [funcionario].[All].children  } ON ROWS
+FROM [CUBO DA GENTE] WHERE ([Measures].[entregador])
+
+11. 
+
