@@ -97,14 +97,14 @@ def main():
 
 	#--------------------OUTPUT--------------------------------
 	sql_orders_file = open("orders.sql", "w")
-	sql_orders_file.write("USE [lolbibs]\nGO\n\n")
+	sql_orders_file.write("USE [lolbibis]\nGO\n\n")
 	for line in orders:
 		sql_orders_file.write(line + "\n")
 	sql_orders_file.write('GO\n\n')
 	sql_orders_file.close()
 
 	sql_sales_file = open("sales.sql", "w")
-	sql_sales_file.write("USE [lolbibs]\nGO\n\n")
+	sql_sales_file.write("USE [lolbibis]\nGO\n\n")
 	for line in sales:
 		sql_sales_file.write(line + "\n")
 	sql_sales_file.write('GO\n\n')

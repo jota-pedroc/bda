@@ -107,7 +107,7 @@ def main():
 	#--------------------------OUTPUT-------------------------------
 	# count = {}
 	sql_clients_file = open("clients.sql", "w")
-	sql_clients_file.write("USE [lolbibs]\nGO\n\n")
+	sql_clients_file.write("USE [lolbibis]\nGO\n\n")
 	for person in persons:
 		#print person
 		#print person.insertStmnt()	

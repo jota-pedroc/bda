@@ -117,7 +117,7 @@ def main():
 	#--------------------------OUTPUT-------------------------------
 	count = {}
 	sql_employees_file = open("employees.sql", "w")
-	sql_employees_file.write("USE [lolbibs]\nGO\n\n")
+	sql_employees_file.write("USE [lolbibis]\nGO\n\n")
 	for employee in employees:
 		#print person
 		#print person.insertStmnt()	
