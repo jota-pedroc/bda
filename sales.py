@@ -1,6 +1,8 @@
 from random import randint
 from client import load_persons
 from product import load_products
+from establishment import create_establishments
+import datetime
 
 
 
@@ -12,60 +14,97 @@ def order_from_client_city(client, cities):
 
 #([quantiade], [valor], [taxa_entrega], [tempo_fk], [funcionario_id], [cliente_id], [pedido_id], [produto_id], [desconto])
 
-def generate_sale(products, persons, cities):
-	# 1. pick a establishment (pick a neighborhood)
+def get_cities_to_clients(client_list):
+	dic = {}
+	for client in client_list:
+		if client.city not in dic:
+			dic[client.city] = []
+		dic[client.city].append(client)
+	return dic
 
-	# 2. pick a client from the same city
+def generate_sales(n_sales, establishments, cities_to_clients, products, employees):
+	payment_methods = ['cartao', 'dinheiro']
+	order_id = 1
+	orders = []	
+	sales = []
+	for n in range(n_sales):
+		# 1. pick a establishment (pick a neighborhood)
+		establishment = establishments[randint(0,len(establishments)-1)]
 
-	# 3. pick a list of products and quantity of products
+		# 2. pick a client from the same city
+		city = establishment.city
+		possible_clients = cities_to_clients[city]
+		client = possible_clients[randint(0, len(possible_clients)-1)]
 
-	# 4. pick a payment method
+		# 3. pick a list of products and quantity of products
+		n_products = randint(1,5)
+		selected_products = []
+		product_quantity = []
+		for i in range(n_products):
+			product = products[randint(0, len(products)-1)]
+			selected_products.append(product)
+			product_quantity.append(randint(1,5))
 
-	# 5. pick a time
+		# 4. pick a payment method
+		payment_method = payment_methods[randint(0, len(payment_methods)-1)]
 
-	# 6. pick an employee from that establishment
+		# 5. pick a time
+		time = randint(1325469526, 1445867507) 
+		date = datetime.datetime.fromtimestamp(time)
+		time = str(date) + '.000'
 
-	# 7. generate an order
+		# 6. pick an employee from that establishment
+		#employee = employees[randint(0, len(employees)-1)]
 
-	# 8. generate a sale for each product (all refering to the same order)
+		# 7. generate an order
+		order = "INSERT INTO [dbo].[Pedido] ([pedido_id],[forma_pagamento], [cidade_nome], [cidade_bairro_nome], [cidade_bairro_cep], [cidade_bairro_estabelecimento_nome], [cidade_bairro_estabelecimento_cnpj], [cidade_bairro_estabelecimento_telefone])" + " VALUES ({},'{}', '{}','{}','{}', '{}','{}','{}');".format(order_id, payment_method, establishment.city, establishment.neighborhood, establishment.zip, establishment.name, establishment.cnpj, establishment.phone)
+		orders.append(order)
 
+		# 8. generate a sale for each product (all refering to the same order)
+		discount = 0
+		delivery = randint(5,10)		
+		for idx, product in enumerate(selected_products):
+			quantity = product_quantity[idx]
+			dummy= '0'
+			sale = ("INSERT INTO [dbo].[Venda] ([quantidade], [valor], [taxa_entrega], [tempo_fk], [funcionario_id], [cliente_id], [pedido_id], [produto_id], [desconto])" + 
+				" VALUES ({!s}, CAST('${:.2f}' AS MONEY),CAST('${:.2f}' AS MONEY),'{}',{},{},{},{},{});").format(
+					quantity, 
+					product.price*quantity, 
+					delivery, 
+					time, 
+					dummy, 
+					client.id, 
+					order_id, 
+					product.id, 
+					discount)
+			sales.append(sale)
 
-	#lista de produtos
-
-
-
-
-	product = randint(0, len(products)-1) # select one product among the loaded products
-
-	quantity = randint(1,5) # random quantity between 1 and 5
-
-	price = float(products[product].price) * quantity # sale price = product price * quantity
-
-	delivery = randint(5,10) # random delivery fee between 5 and 10
-
-	time = randint(1414331506, 1445867507) # random time from 26/10/2014 untill 26/10/2015
-
-	employee = randint(1, 11) # random employee id
-
-	client = persons[randint(1, len(persons)-1)] # select a client among the loaded clients
-
-	order = order_from_client_city(client, cities) # get a order id corresponding to the client city
-
-	discount = 0 # no discounts are currently being given
-
-	return ("INSERT INTO [dbo].[Venda] ([quantidade], [valor], [taxa_entrega], [tempo_fk], [funcionario_id], [cliente_id], [pedido_id], [produto_id], [desconto])"+
-			" VALUES ({!s}, CAST('${:.2f}' AS MONEY),CAST('${:.2f}' AS MONEY),'{}','{}','{}','{}','{}','{}');").format(quantity, price, delivery, time, employee, client.id, order, product, discount)
+		order_id += 1
+	return (orders, sales)
 
 def main():
-	#---------------------INPUT--------------------------------
-	products = load_products('products.sql')
+	#---------------------INPUT--------------------------------	
+	establishments = create_establishments('cities.txt', 'neighborhoods.txt')
 	persons = load_persons('clients.sql')
-	cities = [line.rstrip('\n') for line in open('cities.txt')]
+	products = load_products('products.sql')
+	employees = []#load_employees('employees.sql')
+	n_orders = 5000
+	#-------------------EXECUTION------------------------------
+	cities_to_clients = get_cities_to_clients(persons)
+	(orders, sales) = generate_sales(n_orders, establishments, cities_to_clients, products, employees)
 
-	#--------------EXECUTION AND OUTPUT------------------------
-	n_sales = 50
+
+	#--------------------OUTPUT--------------------------------
+	sql_orders_file = open("orders.sql", "w")
+	for line in orders:
+		sql_orders_file.write(line + "\n")
+	sql_orders_file.write('GO\n\n')
+	sql_orders_file.close()
+
 	sql_sales_file = open("sales.sql", "w")
-	for i in range(n_sales):
-		sql_sales_file.write(generate_sale(products, persons, cities) + "\n")
+	for line in sales:
+		sql_sales_file.write(line + "\n")
+	sql_sales_file.write('GO\n\n')
 	sql_sales_file.close()
+
 		

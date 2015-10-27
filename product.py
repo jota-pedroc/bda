@@ -24,7 +24,7 @@ class Product:
 			if isinstance(val, str) and 'CAST' in val:
 				start = val.find('$')
 				end = val.find('\'', start)
-				args[idx] = val[start+1:end]
+				args[idx] = float(val[start+1:end])
 			else:
 				args[idx] = val.strip('\'();')
 		return Product(*args)
