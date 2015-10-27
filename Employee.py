@@ -18,11 +18,13 @@ class Employee:
 
 	def insertStmnt(self):
 		return ("INSERT INTO [dbo].[Funcionario] ([funcionario_id], [funcionario_nome], [sexo], [telefone], [cpf], [salario])"+
-			" VALUES ({!s},'{}','{}','{}','{}',CAST('${}' AS MONEY));").format(self.id, self.name, self.sex, self.phone, self.cpf, self.payment)
+			" VALUES ({!s},'{}','{}','{}','{}',CAST('${:.2f}' AS MONEY));").format(self.id, self.name, self.sex, self.phone, self.cpf, self.payment)
 
 	
 	@staticmethod
 	def employee_from_insert_stmnt(stmnt):
+		if not stmnt.strip() or 'GO' in stmnt:
+			return None
 		values = stmnt.find("VALUES")
 		first_arg = stmnt.find('(', values)
 		end = stmnt.find(')', values)
@@ -35,12 +37,13 @@ class Employee:
 
 #-----------------AUXILIARY FUNCTIONS-----------------------
 
-def load_employee(file_path):
-	"""Given a file path to a sql file with enployee insert statements, return me the python list of corresponding Enployee instances"""
+def load_employees(file_path):
+	"""Given a file path to a sql file with employee insert statements, return me the python list of corresponding Employee instances"""
 	employees = []
 	for line in open(file_path):
-		employee = Enployee.enployee_from_insert_stmnt(line)
-		employees.append(employee)
+		employee = Employee.employee_from_insert_stmnt(line)
+		if employee:
+			employees.append(employee)
 	return employees
 
 #-----------------------GENERATOR---------------------------
@@ -53,7 +56,7 @@ def generate_employees(maleNames, femaleNames, amount):
 
 	employees = []
 	employee_id = 1
-	sexes = [0, 1]
+	sexes = ['M', 'F']
 	phone_id = 0
 	cpf_id  = 0
 	payment = 2000.00
@@ -113,11 +116,13 @@ def main():
 
 	#--------------------------OUTPUT-------------------------------
 	count = {}
-	sql_employees_file = open("enployees.sql", "w")
+	sql_employees_file = open("employees.sql", "w")
 	for employee in employees:
 		#print person
 		#print person.insertStmnt()	
 		sql_employees_file.write(employee.insertStmnt() + "\n")
+	sql_employees_file.write('GO\n\n')
+	sql_employees_file.close()
 
 
 	#------------------STATS REPORTING----------------------

@@ -24,6 +24,8 @@ class Person:
 	
 	@staticmethod
 	def person_from_insert_stmnt(stmnt):
+		if not stmnt.strip() or 'GO' in stmnt:
+			return None
 		values = stmnt.find("VALUES")
 		first_arg = stmnt.find('(', values)
 		end = stmnt.find(')', values)
@@ -46,7 +48,8 @@ def load_persons(file_path):
 	persons = []
 	for line in open(file_path):
 		person = Person.person_from_insert_stmnt(line)
-		persons.append(person)
+		if person:
+			persons.append(person)
 	return persons
 
 #-----------------------GENERATOR---------------------------

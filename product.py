@@ -17,6 +17,8 @@ class Product:
 
 	@staticmethod
 	def product_from_insert_stmnt(stmnt):
+		if not stmnt.strip() or 'GO' in stmnt:
+			return None
 		values = stmnt.find("VALUES")
 		first_arg = stmnt.find('(', values)
 		args = stmnt[first_arg:].split(',')
@@ -34,6 +36,7 @@ def load_products(file_path):
 	products = []
 	for line in open(file_path):
 		product = Product.product_from_insert_stmnt(line)
-		products.append(product)
+		if product:
+			products.append(product)
 	return products
 		

@@ -2,6 +2,7 @@ from random import randint
 from client import load_persons
 from product import load_products
 from establishment import create_establishments
+from Employee import load_employees
 import datetime
 
 
@@ -54,7 +55,7 @@ def generate_sales(n_sales, establishments, cities_to_clients, products, employe
 		time = str(date) + '.000'
 
 		# 6. pick an employee from that establishment
-		#employee = employees[randint(0, len(employees)-1)]
+		employee = employees[randint(0, len(employees)-1)]
 
 		# 7. generate an order
 		order = "INSERT INTO [dbo].[Pedido] ([pedido_id],[forma_pagamento], [cidade_nome], [cidade_bairro_nome], [cidade_bairro_cep], [cidade_bairro_estabelecimento_nome], [cidade_bairro_estabelecimento_cnpj], [cidade_bairro_estabelecimento_telefone])" + " VALUES ({},'{}', '{}','{}','{}', '{}','{}','{}');".format(order_id, payment_method, establishment.city, establishment.neighborhood, establishment.zip, establishment.name, establishment.cnpj, establishment.phone)
@@ -65,14 +66,13 @@ def generate_sales(n_sales, establishments, cities_to_clients, products, employe
 		delivery = randint(5,10)		
 		for idx, product in enumerate(selected_products):
 			quantity = product_quantity[idx]
-			dummy= '0'
 			sale = ("INSERT INTO [dbo].[Venda] ([quantidade], [valor], [taxa_entrega], [tempo_fk], [funcionario_id], [cliente_id], [pedido_id], [produto_id], [desconto])" + 
 				" VALUES ({!s}, CAST('${:.2f}' AS MONEY),CAST('${:.2f}' AS MONEY),'{}',{},{},{},{},{});").format(
 					quantity, 
 					product.price*quantity, 
 					delivery, 
 					time, 
-					dummy, 
+					employee.id, 
 					client.id, 
 					order_id, 
 					product.id, 
@@ -87,7 +87,7 @@ def main():
 	establishments = create_establishments('cities.txt', 'neighborhoods.txt')
 	persons = load_persons('clients.sql')
 	products = load_products('products.sql')
-	employees = []#load_employees('employees.sql')
+	employees = load_employees('employees.sql')
 	n_orders = 5000
 	#-------------------EXECUTION------------------------------
 	cities_to_clients = get_cities_to_clients(persons)
