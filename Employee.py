@@ -17,7 +17,7 @@ class Employee:
 		return '(' + self.name + '-' + self.cpf + ')'
 
 	def insertStmnt(self):
-		return ("INSERT INTO [dbo].[Funcionario] ([funcionario_id], [nome], [sexo], [telefone], [cpf], [salario])"+
+		return ("INSERT INTO [dbo].[Funcionario] ([funcionario_id], [funcionario_nome], [sexo], [telefone], [cpf], [salario])"+
 			" VALUES ({!s},'{}','{}','{}','{}',CAST('${}' AS MONEY));").format(self.id, self.name, self.sex, self.phone, self.cpf, self.payment)
 
 	
